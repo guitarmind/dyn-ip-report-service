@@ -61,7 +61,14 @@ def sendNewReport(apiUrl, nic):
     # print "ip: " + ip
 
     # get SSH port info
-    sshPort = "1104"
+    try:
+        p = subprocess.Popen(['cat', '/etc/ssh/sshd_config'], stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(['grep', 'Port'], stdin=p.stdout, stdout=subprocess.PIPE)
+        p3 = subprocess.Popen(['awk', '{ print $2 }'], stdin=p2.stdout, stdout=subprocess.PIPE)
+        (sshPort, err) = p3.communicate()
+        sshPort = sshPort.replace('\n', '')
+    except:
+        sshPort = "22"
     # print "sshPort: " + sshPort
 
     request = { 'hostname': hostname, 'ip': ip, 'ssh_port': sshPort, 'update_time': update_time }

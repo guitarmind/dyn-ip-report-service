@@ -15,6 +15,10 @@ Logging settings
 """
 logger = logging.getLogger('DynIPReport')
 logger.setLevel(logging.INFO)
+try:
+    os.remove('dyn_report_service.log')
+except OSError:
+    pass
 fileHandler = logging.FileHandler('dyn_report_service.log')
 fileHandler.setLevel(logging.INFO)
 # console handler
@@ -86,6 +90,7 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
             os.chdir(tmpFileFolder)
             filePathList = os.listdir(".")
             filePathList.sort()
+            os.chdir(workingFolderPath)
 
             for fileFullName in filePathList:
                 rowData = None
