@@ -75,6 +75,12 @@ For instance:
     python report-client.py -a "http://localhost:1666/report" -m "period" -n "eth0" -t 10
 
 
+###How to access Summary Page
+
+You can access the summary page under the '/summary' path of current domain.
+For instance, if you setup report server on localhost at port 1666, then the link for summary page would be:
+
+    http://localhost:1666/summary
 
 
 ##Changelog
