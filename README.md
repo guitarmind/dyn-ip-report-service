@@ -1,7 +1,7 @@
 Dynamic IP Report Service
 =========================
 
-A utility service for automatical gathering of dynamic IP addresses on multiple hosts and VM guests.
+An utility service for automatical gathering of dynamic IP addresses on multiple hosts and VM guests.
 
 ![alt tag](https://raw.github.com/guitarmind/dyn-ip-report-service/master/snapshot.png)
 
