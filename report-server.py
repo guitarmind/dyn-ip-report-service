@@ -6,6 +6,9 @@ import optparse
 import logging
 import traceback
 import os
+from os import listdir
+from os.path import isfile, join
+import json
 
 """
 Logging settings
@@ -38,10 +41,27 @@ class DynIpReportHanlder(tornado.web.RequestHandler):
             # parse received json
             jsonobj = json.loads(self.request.body)
 
+            hostname = jsonobj['hostname']
+            ip = jsonobj['ip']
+            ssh_port = jsonobj['ssh_port']
+            update_time = jsonobj['update_time']
 
+            print "Received report: " + hostname + ", " + ip + ", " + ssh_port + ", " + update_time
+
+            # create temp folder if not exits
+            tmpFileFolder = workingFolderPath + "/temp"
+            if not os.path.exists(tmpFileFolder):
+                os.makedirs(tmpFileFolder)
+
+            # write to text file
+            f = open(tmpFileFolder + "/" + hostname + ".txt", "w")
+            try:
+                f.write(ip + ',' + ssh_port + ',' + update_time + '\n')
+            finally:
+                f.close()
 
             # send response json
-            response = { 'result': 'OK'}
+            response = { 'result': 'OK' }
             self.write(response)
 
             print response
@@ -53,9 +73,51 @@ class DynIpReportHanlder(tornado.web.RequestHandler):
             logger.error(tb)
 
 """
+Handles the summary data for adminstrator.
+"""
+class SummaryDataHanlder(tornado.web.RequestHandler):
+    def get(self):
+        try:
+            self.set_header("Content-Type", "text/html; charset=UTF-8")
+
+            responseData = []
+            # read from text file
+            tmpFileFolder = workingFolderPath + "/temp"
+            filePathList = [ f for f in listdir(tmpFileFolder) if isfile(join(tmpFileFolder, f)) ]
+
+            for fileFullName in filePathList:
+                rowData = None
+                fileName = fileFullName.replace(".txt", "")
+                f = open(tmpFileFolder + "/" + fileFullName, "r")
+                try:
+                    # Read the entire contents of a file at once.
+                    raw = f.read()
+                    if raw is not None:
+                        data = raw.split(',')
+                        rowData = { 'hostname': fileName, 'ip': data[0], 'ssh_port': data[1], 'update_time': data[2] }
+                        responseData.append(rowData)
+                finally:
+                    f.close()
+
+            responseMsg = { 'result': responseData }
+
+            self.write(responseMsg)
+
+        except IOError:
+            tb = traceback.format_exc()
+            errMsg = { 'error': tb }
+            self.write(errMsg)
+            logger.error(tb)
+        except:
+            tb = traceback.format_exc()
+            errMsg = { 'error': tb }
+            self.write(errMsg)
+            logger.error(tb)
+
+"""
 Handles the summary page for adminstrator.
 """
-class SummaryReportHanlder(tornado.web.RequestHandler):
+class SummaryPageHanlder(tornado.web.RequestHandler):
     def get(self):
         try:
             self.set_header("Content-Type", "text/html; charset=UTF-8")
@@ -85,8 +147,8 @@ def main():
    
     application = tornado.web.Application([
                     (r"/report", DynIpReportHanlder),
-                    (r"/summary", SummaryReportHanlder),
-                    (r'/img/(.*)',tornado.web.StaticFileHandler,{'path':"website/img"}),
+                    (r"/data", SummaryDataHanlder),
+                    (r"/summary", SummaryPageHanlder),
                     (r'/css/(.*)',tornado.web.StaticFileHandler,{'path':"website/css"}),
                     (r'/js/(.*)',tornado.web.StaticFileHandler,{'path':"website/js"})])
 

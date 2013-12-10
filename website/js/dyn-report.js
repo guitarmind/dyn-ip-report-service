@@ -1,6 +1,5 @@
 // global variable
-var lastIndex = 0,
-    requestSent = false;
+var lastIndex = 0;
 
 $(function() {
 
@@ -56,6 +55,64 @@ $(function() {
             $el.removeClass("current");
         }
     });
+
+    // hide result table
+    $resultTable.hide();
+
+    // get summary report by AJAX
+    sendAJAX();
+
+    // show result table
+    if (!$resultTable.is(":visible"))
+        $resultTable.fadeIn(250);
 });
 
+function sendAJAX() {
+    var $el,
+        $resultTable = $("table#resultTable");
 
+    $.ajax({
+        async: true,
+        cache: false,
+        type: 'GET',
+        url: '/data',
+        contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
+        success: function(data) {
+            var resultObj = data.result;
+            var errObj = data.error;
+
+            try { 
+                if(resultObj !== undefined) {
+                    // for each site result
+                    $.each(resultObj, function(index, dataObj) {
+                        var hostname = dataObj.hostname;
+                        var ip = dataObj.ip;
+                        var ssh_port = dataObj.ssh_port;
+                        var update_time = dataObj.update_time;
+
+                        var newRowStr = "<tr> \
+                                            <td>" + (lastIndex + 1) + "</td> \
+                                            <td class=\"hostname\">" + hostname + "</td> \
+                                            <td class=\"ipaddr\">" + ip + "</td> \
+                                            <td class=\"numbers\">" + ssh_port + "</td> \
+                                            <td class=\"numbers\">" + update_time + "</td> \
+                                         </tr>";
+
+                        $resultTable.append(newRowStr);
+
+                        lastIndex++;
+                    }); // end of site array loop
+                }
+            } catch(err) {
+                var vDebug = "";
+                for (var prop in err) { 
+                   vDebug += "property: "+ prop+ " value: ["+ err[prop]+ "]\n";
+                }
+                vDebug += "toString(): " + " value: [" + err.toString() + "]";
+
+                console.log(vDebug);
+            }
+        }
+    });
+}
