@@ -85,7 +85,7 @@ Similarly, to start it as a persistent service even after terminal logout:
 
 ###How to access Summary Page
 
-You can access the summary page under the '/summary' path of current domain.
+You can access the summary page under the '**/summary**' path of current domain.
 For instance, if you setup report server on localhost at port 1666, then the link for summary page would be:
 
     http://localhost:1666/summary
@@ -98,7 +98,8 @@ For instance, if you setup report server on localhost at port 1666, then the lin
 Features:
 
   - Client/Server architecture for reporting service
-  - Support timer for reporting client info periodically
+  - JSON-based communications
+  - Support timer for gathering client machine info periodically
   - Provides a summary page for administrator
 
 
