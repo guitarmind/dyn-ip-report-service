@@ -3,6 +3,8 @@ Dynamic IP Report Service
 
 A utility service for automatically gathering of dynamic IP addresses on multiple hosts and VM guests.
 
+![alt tag](https://raw.github.com/guitarmind/dyn-ip-report-service/master/snapshot.png)
+
 In real-world scenarios, sometimes we encounter problems in managing large amount of physical hosts or virtual machines with dynamic IP addresses. It is really painful to update their address information manually. 
 
 This service can greatly help the administrators who have similar management issues. 
