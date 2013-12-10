@@ -4,7 +4,7 @@ Dynamic IP Report Service
 A utility service for automatically gathering of dynamic IP addresses on multiple hosts and VM guests.
 
 
-###Installation
+###Installation on Ubuntu 12.04 LTS
 
 For both client and server, make sure to install python and tornado library.
 
