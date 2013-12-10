@@ -1,7 +1,7 @@
 Dynamic IP Report Service
 =========================
 
-A utility service for automatically gathering of dynamic IP addresses on multiple hosts and VM guests.
+A utility service for automatical gathering of dynamic IP addresses on multiple hosts and VM guests.
 
 ![alt tag](https://raw.github.com/guitarmind/dyn-ip-report-service/master/snapshot.png)
 
@@ -47,6 +47,10 @@ Please make sure that the firewall is opened for lisenting port.
 For example, you can change the port to 8080 by:
 
     python report-server.py -p 8080
+    
+To start it as a persistent service even after terminal logout:
+
+    sudo nohup python report-server.py -p 8080 &
 
 ###How to start Report Client
 
@@ -67,13 +71,17 @@ Type the following command to check the options.
                             the SSH port of current machine.
       -m MODE, --mode=MODE  two options: once | period
       -n NIC, --nic=NIC     the target NIC to report IP address.
-      -t TIME, --time=TIME  the time interval in minutes for periodically task.
+      -t TIME, --time=TIME  the time interval in minutes for periodical tasks.
 
 
 For instance:
 
     python report-client.py -a "http://localhost:1666/report" -m "period" -n "eth0" -t 10
 
+
+Similarly, to start it as a persistent service even after terminal logout:
+
+    sudo nohup report-client.py -a "http://localhost:1666/report" -m "period" -n "eth0" -t 10 &
 
 ###How to access Summary Page
 
