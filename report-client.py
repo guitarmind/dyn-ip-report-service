@@ -96,7 +96,7 @@ def main():
     parser.add_option('-p', '--ssh-port', dest='sshPort', help='the SSH port of current machine.')
     parser.add_option('-m', '--mode', dest='mode', help='two options: once | period')
     parser.add_option('-n', '--nic', dest='nic', help='the target NIC to report IP address.')
-    parser.add_option('-t', '--time', dest='time', help='the time interval in minutes for periodically task.')
+    parser.add_option('-t', '--time', dest='time', help='the time interval in minutes for periodical tasks.')
     (options, args) = parser.parse_args()
 
     global periodMode
