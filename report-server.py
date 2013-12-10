@@ -83,7 +83,9 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
             responseData = []
             # read from text file
             tmpFileFolder = workingFolderPath + "/temp"
-            filePathList = [ f for f in listdir(tmpFileFolder) if isfile(join(tmpFileFolder, f)) ]
+            os.chdir(tmpFileFolder)
+            filePathList = os.listdir(".")
+            filePathList.sort()
 
             for fileFullName in filePathList:
                 rowData = None
