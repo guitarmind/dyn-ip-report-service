@@ -7,7 +7,7 @@ In real-world scenarios, sometimes we encounter problems in managing large amoun
 
 This service can greatly help the administrators who have similar management issues. 
 
-The report client will update the latest information of current machine (e.g., hostname, IP address and SSH port) and send to the report server. Report server maintains and summarizes a list of machine infomation for multiple host and VM guests. It also provides a summary page for administrators to see a full info list of all managed machines.
+The report client retrieves the latest information of current machine (e.g., hostname, IP address and SSH port) and sends to the report server. Report server maintains and summarizes a list of machine infomation for multiple host and VM guests. It also provides a summary page for administrators to see a full info list of all managed machines.
 
 
 ###Installation on Ubuntu 12.04 LTS
