@@ -39,3 +39,4 @@ dyn_report_service.log
 temp/
 temp/*
 output.log
+report_ip.log
