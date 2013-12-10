@@ -38,3 +38,4 @@ nosetests.xml
 dyn_report_service.log
 temp/
 temp/*
+output.log
