@@ -4,9 +4,9 @@ Dynamic IP Report Service
 A utility service for automatically gathering of dynamic IP addresses on multiple hosts and VM guests.
 
 
-####Installation
+###Installation
 
-Both client and server should do the following installation.
+For both client and server, make sure to install python and tornado library.
 
 Python Requirement
 
