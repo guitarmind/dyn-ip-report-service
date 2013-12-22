@@ -195,7 +195,7 @@ class SummaryPageHanlder(tornado.web.RequestHandler):
 def main():
     parser = optparse.OptionParser()
     parser.add_option('-p', '--port', dest='port', help='the listening port of dynamic IP report service (default: 1666)')
-    parser.add_option('-a', '--alarm-threshold', dest='alarmThreshold', help='The threshold minutes to send alarm email by Gmail if last update time is longer than it (default: 30)')
+    parser.add_option('-a', '--alarm-threshold', dest='alarmThreshold', help='The threshold minutes to send alarm email by Gmail if the time passed since last update time is longer than it (default: 30)')
     parser.add_option('-g', '--gmail-addr', dest='gmailAddr', help='The administrator\'s Gmail')
     parser.add_option('-u', '--username', dest='userName', help='The administrator\'s Gmail username')
     parser.add_option('-s', '--password', dest='passWord', help='The administrator\'s Gmail password')

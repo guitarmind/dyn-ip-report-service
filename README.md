@@ -40,6 +40,14 @@ Type the following command to check the options.
       -h, --help            show this help message and exit
       -p PORT, --port=PORT  the listening port of dynamic IP report service
                             (default: 1666)
+      -a ALARMTHRESHOLD, --alarm-threshold=ALARMTHRESHOLD
+                            The threshold minutes to send alarm email by Gmail if the time passed since last update time is longer than it (default: 30)
+      -g GMAILADDR, --gmail-addr=GMAILADDR
+                            The administrator's Gmail
+      -u USERNAME, --username=USERNAME
+                            The administrator's Gmail username
+      -s PASSWORD, --password=PASSWORD
+                            The administrator's Gmail password
                             
 The default listening port is **1666**. Change it to yours on startup.
 Please make sure that the firewall is opened for lisenting port.
@@ -51,6 +59,12 @@ For example, you can change the port to 8080 by:
 To start it as a persistent service even after terminal logout:
 
     sudo nohup python report-server.py -p 8080 &
+
+If you would like to enable alarm feature with Gmail, you need to configure settings:
+
+    sudo nohup python report-server.py -a 60 -g "markpeng.ntu@gmail.com" -u "markpeng.ntu" -s "123456"
+
+The above setting triggers the function to send alarm email if there is any machine where the time passed since last update time is longer than alarm threshold.
 
 ###How to start Report Client
 
@@ -102,6 +116,11 @@ Features:
   - Support timer for gathering client machine info periodically
   - Provides a summary page for administrator
 
+####0.0.2 - 2013-12-22
+
+Features:
+
+  - Support machine alarms by GMail
 
 
 ##Copyright and License
