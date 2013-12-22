@@ -195,6 +195,69 @@ class SummaryPageHanlder(tornado.web.RequestHandler):
             self.write(errMsg)
             logger.error(tb)
 
+def alarmMonitor():
+    # read from text file
+    tmpFileFolder = workingFolderPath + "/temp"
+    os.chdir(tmpFileFolder)
+    filePathList = os.listdir(".")
+    filePathList.sort()
+    os.chdir(workingFolderPath)
+
+    alarmMachines = []
+    alarmLastUpdateTimes = []
+    for fileFullName in filePathList:
+        rowData = None
+        fileName = fileFullName.replace(".txt", "")
+        f = open(tmpFileFolder + "/" + fileFullName, "r")
+        try:
+            # Read the entire contents of a file at once.
+            raw = f.read()
+            if raw is not None:
+                data = raw.replace('\n', '').split(',')
+                rowData = { 'hostname': fileName, 'ip': data[0], 'ssh_port': data[1], 'update_time': data[2] }
+                
+                # Send mail to administrator if last update time is longer than threshold
+                last_update_time = datetime.datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S')
+                timspan = datetime.datetime.now() - last_update_time
+                if timspan > datetime.timedelta(minutes=int(alarmThresholdInMinutes)):
+                    rowData['alarm'] = True
+                    alarmMachines.append(fileName)
+                    alarmLastUpdateTimes.append(data[2])
+        finally:
+            f.close()
+
+
+    if len(alarmMachines) > 0:
+        machines = ', '.join(alarmMachines)
+        # Specifying from and to addresses
+        fromAddr = "dyn.reporter@gmail.com"
+        toAddrs = mailRecipients
+        toAddrs.append(adminGmail)
+        subject = "Dynamic IP Report Service: Machine Alarm"
+        content = """<strong>Alarm: </strong><br/>
+                     Something wrong with the following machines: <br/>"""
+        for index, machine in enumerate(alarmMachines):
+            updateTime = alarmLastUpdateTimes[index]
+            content += """<font color=\"red\" style=\"font-size:18px\">%(machine)s</font><br/>
+                         (last update time: %(updateTime)s)<br/><br/>""" % { 'machine': machine, 'updateTime': updateTime }
+        content += """Please check their status.<br/><br/>
+                      Sent by <strong>Dynamic IP Report Service</strong>
+                   """
+        msg = MIMEText(content, 'html')
+        msg['Subject'] = subject
+        msg['From'] = fromAddr
+        msg['To'] = ', '.join(toAddrs)
+
+        # Sending the mail
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.ehlo()
+        server.starttls()
+        server.login(adminGmailUsername, adminGmailPassword)
+        server.sendmail(fromAddr, toAddrs, msg.as_string())
+        server.quit()
+
+        print 'Send alarm: ', machines, ' (recipients: ', ', '.join(toAddrs) , ')'
+
 def main():
     parser = optparse.OptionParser()
     parser.add_option('-p', '--port', dest='port', help='the listening port of dynamic IP report service (default: 1666)')
@@ -234,9 +297,16 @@ def main():
                     (r'/js/(.*)',tornado.web.StaticFileHandler,{'path':"website/js"})])
 
     http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(port)
     print "Dynamic IP Report Service starts at port " + str(port) + "."
-    tornado.ioloop.IOLoop.instance().start()
+    http_server.listen(port)
+
+    # start period timer
+    loop = tornado.ioloop.IOLoop.instance()
+    callbackTime = 3000 + (int(alarmThresholdInMinutes) * 60 * 1000)
+    print "Period Timer Interval: " + alarmThresholdInMinutes + " minutes."
+    periodTaskTimer = tornado.ioloop.PeriodicCallback(callback=alarmMonitor, callback_time=callbackTime, io_loop=loop)
+    periodTaskTimer.start()
+    loop.start()
 
 if __name__ == '__main__':
     main()
