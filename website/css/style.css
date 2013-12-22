@@ -46,6 +46,11 @@ table {
     background: -webkit-gradient(linear, 0% 0%, 0% 25%, from(#D1E8FF), to(#E5F2FF)) !important;
 }
 
+.alarm {
+    background: -moz-linear-gradient(100% 25% 90deg, #FFA3B2, #FF7F94) !important;
+    background: -webkit-gradient(linear, 0% 0%, 0% 25%, from(#FF7F94), to(#FFA3B2)) !important;
+}
+
 .hostname {
     text-align: left; padding-left:40px; 
 }

@@ -20,13 +20,13 @@ $(function() {
     $resultTable.on('mouseenter', 'tr', function(event) {
         $el = $(this);
         // change the color of selected row
-        if(!$el.hasClass("current")) {
+        if(!$el.hasClass("current") && !$el.hasClass("alarm")) {
             $el.addClass('hoveredRow');
         }
     }).on('mouseleave', 'tr', function(event) {
         $el = $(this);
         // change the color of selected row
-        if(!$el.hasClass("current")) {
+        if(!$el.hasClass("current") && !$el.hasClass("alarm")) {
             $el.removeClass('hoveredRow');
             $el.css('background', '-moz-linear-gradient(100% 25% 90deg, #fefefe, #f9f9f9)');
             $el.css('background', '-webkit-gradient(linear, 0% 0%, 0% 25%, from(#f9f9f9), to(#fefefe))');
@@ -39,7 +39,7 @@ $(function() {
         $el = $(this);
         
         // if this is already the active cell, remove current class
-        if (!$el.hasClass("current")) {
+        if(!$el.hasClass("current") && !$el.hasClass("alarm")) {
             
             // make sure the correct column is current
             $("table#resultTable tr").removeClass("current");
@@ -52,7 +52,7 @@ $(function() {
             }
             $prevSelectedRow = $el;
         } else {
-            $el.removeClass("current");
+            $("table#resultTable tr").removeClass("current");
         }
     });
 
@@ -90,8 +90,19 @@ function sendAJAX() {
                         var ip = dataObj.ip;
                         var ssh_port = dataObj.ssh_port;
                         var update_time = dataObj.update_time;
+                        var alarm = dataObj.alarm;
 
-                        var newRowStr = "<tr> \
+                        var newRowStr = "";
+                        if(!alarm)
+                            newRowStr = "<tr> \
+                                            <td>" + (lastIndex + 1) + "</td> \
+                                            <td class=\"hostname\">" + hostname + "</td> \
+                                            <td class=\"ipaddr\">" + ip + "</td> \
+                                            <td class=\"numbers\">" + ssh_port + "</td> \
+                                            <td class=\"numbers\">" + update_time + "</td> \
+                                         </tr>";
+                        else
+                            newRowStr = "<tr class=\"alarm\"> \
                                             <td>" + (lastIndex + 1) + "</td> \
                                             <td class=\"hostname\">" + hostname + "</td> \
                                             <td class=\"ipaddr\">" + ip + "</td> \

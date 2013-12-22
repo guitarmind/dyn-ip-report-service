@@ -9,6 +9,9 @@ import os
 from os import listdir
 from os.path import isfile, join
 import json
+import datetime
+import smtplib
+from email.MIMEText import MIMEText
 
 """
 Logging settings
@@ -33,6 +36,10 @@ logger.addHandler(consoleHandler)
 
 # global variables
 workingFolderPath = os.getcwd()
+alarmThresholdInMinutes = 30
+adminGmail = None
+adminGmailUsername = None
+adminGmailPassword = None
 
 """
 Handles the report of IP address from client.
@@ -92,6 +99,8 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
             filePathList.sort()
             os.chdir(workingFolderPath)
 
+            alarmMachines = []
+            alarmLastUpdateTimes = []
             for fileFullName in filePathList:
                 rowData = None
                 fileName = fileFullName.replace(".txt", "")
@@ -100,11 +109,51 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
                     # Read the entire contents of a file at once.
                     raw = f.read()
                     if raw is not None:
-                        data = raw.split(',')
+                        data = raw.replace('\n', '').split(',')
                         rowData = { 'hostname': fileName, 'ip': data[0], 'ssh_port': data[1], 'update_time': data[2] }
+                        
+                        # Send mail to administrator if last update time is longer than threshold
+                        last_update_time = datetime.datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S')
+                        timspan = datetime.datetime.now() - last_update_time
+                        if timspan > datetime.timedelta(minutes=int(alarmThresholdInMinutes)):
+                            rowData['alarm'] = True
+                            alarmMachines.append(fileName)
+                            alarmLastUpdateTimes.append(data[2])
+
                         responseData.append(rowData)
                 finally:
                     f.close()
+
+
+            if len(alarmMachines) > 0:
+                machines = ', '.join(alarmMachines)
+                # Specifying from and to addresses
+                fromAddr = "dyn.reporter@gmail.com"
+                toAddrs  = []
+                toAddrs.append(adminGmail)
+                subject = "Dynamic IP Report Service: Machine Alarm"
+                content = """<strong>Alarm: </strong><br/>
+                             Something wrong with the following machines: <br/>"""
+                for index, machine in enumerate(alarmMachines):
+                    updateTime = alarmLastUpdateTimes[index]
+                    content += """<font color=\"red\" style=\"font-size:18px\">%(machine)s</font><br/>
+                                 (last update time: %(updateTime)s)<br/><br/>""" % { 'machine': machine, 'updateTime': updateTime }
+                content += "Please check their status."
+                msg = MIMEText(content, 'html')
+                msg['Subject'] = subject
+                msg['From'] = fromAddr
+                msg['To'] = ', '.join(toAddrs)
+
+                # Sending the mail
+                server = smtplib.SMTP('smtp.gmail.com:587')
+                server.ehlo()
+                server.starttls()
+                print adminGmailUsername, adminGmailPassword
+                server.login(adminGmailUsername, adminGmailPassword)
+                server.sendmail(fromAddr, toAddrs, msg.as_string())
+                server.quit()
+
+                print 'Send alarm: ', machines
 
             responseMsg = { 'result': responseData }
 
@@ -146,11 +195,28 @@ class SummaryPageHanlder(tornado.web.RequestHandler):
 def main():
     parser = optparse.OptionParser()
     parser.add_option('-p', '--port', dest='port', help='the listening port of dynamic IP report service (default: 1666)')
+    parser.add_option('-a', '--alarm-threshold', dest='alarmThreshold', help='The threshold minutes to send alarm email by Gmail if last update time is longer than it (default: 30)')
+    parser.add_option('-g', '--gmail-addr', dest='gmailAddr', help='The administrator\'s Gmail')
+    parser.add_option('-u', '--username', dest='userName', help='The administrator\'s Gmail username')
+    parser.add_option('-s', '--password', dest='passWord', help='The administrator\'s Gmail password')
     (options, args) = parser.parse_args()
 
     port = options.port
     if not options.port:   # if port is not given, use the default one 
       port = 1666
+
+    global alarmThresholdInMinutes
+    global adminGmail
+    global adminGmailUsername
+    global adminGmailPassword
+
+    if options.alarmThreshold:
+        if not options.gmailAddr or not options.userName or not options.passWord:
+            parser.error('Gmail setting is not completed.')
+        alarmThresholdInMinutes = options.alarmThreshold
+        adminGmail = options.gmailAddr
+        adminGmailUsername = options.userName
+        adminGmailPassword = options.passWord.replace('\\', '')
    
     application = tornado.web.Application([
                     (r"/report", DynIpReportHanlder),
