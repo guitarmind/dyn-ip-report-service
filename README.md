@@ -70,7 +70,7 @@ If you would like to enable alarm feature with Gmail, you need to configure sett
 
     sudo nohup python report-server.py -a 60 -g "markpeng.ntu@gmail.com" -u "markpeng.ntu" -s "123456" -r "amber@gmail.com;mark@123.com" &
 
-The above setting triggers the function to send alarm email if there is any machine where the time passed since its last update time is longer than alarm threshold.
+The above setting triggers the function to send alarm email if there is any machine where the time passed since its last update time is longer than alarm threshold. It also creates a period timer to check the status of machines every **ALARMTHRESHOLD** minutes.
 
 ###How to start Report Client
 
