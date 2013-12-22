@@ -127,6 +127,7 @@ Features:
 Features:
 
   - Support machine alarms by Gmail
+  - Period timer for alarm monitoring
 
 
 ##Copyright and License
