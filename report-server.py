@@ -40,6 +40,7 @@ alarmThresholdInMinutes = 30
 adminGmail = None
 adminGmailUsername = None
 adminGmailPassword = None
+mailRecipients = []
 
 """
 Handles the report of IP address from client.
@@ -129,7 +130,7 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
                 machines = ', '.join(alarmMachines)
                 # Specifying from and to addresses
                 fromAddr = "dyn.reporter@gmail.com"
-                toAddrs  = []
+                toAddrs = mailRecipients
                 toAddrs.append(adminGmail)
                 subject = "Dynamic IP Report Service: Machine Alarm"
                 content = """<strong>Alarm: </strong><br/>
@@ -138,7 +139,9 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
                     updateTime = alarmLastUpdateTimes[index]
                     content += """<font color=\"red\" style=\"font-size:18px\">%(machine)s</font><br/>
                                  (last update time: %(updateTime)s)<br/><br/>""" % { 'machine': machine, 'updateTime': updateTime }
-                content += "Please check their status."
+                content += """Please check their status.<br/><br/>
+                              Sent by <strong>Dynamic IP Report Service</strong>
+                           """
                 msg = MIMEText(content, 'html')
                 msg['Subject'] = subject
                 msg['From'] = fromAddr
@@ -153,7 +156,7 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
                 server.sendmail(fromAddr, toAddrs, msg.as_string())
                 server.quit()
 
-                print 'Send alarm: ', machines
+                print 'Send alarm: ', machines, ' (recipients: ', ', '.join(toAddrs) , ')'
 
             responseMsg = { 'result': responseData }
 
@@ -199,6 +202,7 @@ def main():
     parser.add_option('-g', '--gmail-addr', dest='gmailAddr', help='The administrator\'s Gmail')
     parser.add_option('-u', '--username', dest='userName', help='The administrator\'s Gmail username')
     parser.add_option('-s', '--password', dest='passWord', help='The administrator\'s Gmail password')
+    parser.add_option('-r', '--recipients', dest='recipients', help='List of recipients\' emails other than the administrator, separated by semicolon.')
     (options, args) = parser.parse_args()
 
     port = options.port
@@ -209,14 +213,18 @@ def main():
     global adminGmail
     global adminGmailUsername
     global adminGmailPassword
+    global mailRecipients
 
     if options.alarmThreshold:
-        if not options.gmailAddr or not options.userName or not options.passWord:
-            parser.error('Gmail setting is not completed.')
         alarmThresholdInMinutes = options.alarmThreshold
+
+    if options.gmailAddr:
+        if not options.userName or not options.passWord or not options.recipients:
+            parser.error('Gmail setting is not completed.')
         adminGmail = options.gmailAddr
         adminGmailUsername = options.userName
         adminGmailPassword = options.passWord.replace('\\', '')
+        mailRecipients = options.recipients.split(';')
    
     application = tornado.web.Application([
                     (r"/report", DynIpReportHanlder),

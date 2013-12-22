@@ -41,13 +41,19 @@ Type the following command to check the options.
       -p PORT, --port=PORT  the listening port of dynamic IP report service
                             (default: 1666)
       -a ALARMTHRESHOLD, --alarm-threshold=ALARMTHRESHOLD
-                            The threshold minutes to send alarm email by Gmail if the time passed since last update time is longer than it (default: 30)
+                            The threshold minutes to send alarm email by Gmail if
+                            the time passed since last update time is longer than
+                            it (default: 30)
       -g GMAILADDR, --gmail-addr=GMAILADDR
                             The administrator's Gmail
       -u USERNAME, --username=USERNAME
                             The administrator's Gmail username
       -s PASSWORD, --password=PASSWORD
                             The administrator's Gmail password
+      -r RECIPIENTS, --recipients=RECIPIENTS
+                            List of recipients' emails other than the
+                            administrator, separated by semicolon.
+
                             
 The default listening port is **1666**. Change it to yours on startup.
 Please make sure that the firewall is opened for lisenting port.
@@ -62,7 +68,7 @@ To start it as a persistent service even after terminal logout:
 
 If you would like to enable alarm feature with Gmail, you need to configure settings:
 
-    sudo nohup python report-server.py -a 60 -g "markpeng.ntu@gmail.com" -u "markpeng.ntu" -s "123456" &
+    sudo nohup python report-server.py -a 60 -g "markpeng.ntu@gmail.com" -u "markpeng.ntu" -s "123456" -r "amber@gmail.com;mark@123.com" &
 
 The above setting triggers the function to send alarm email if there is any machine where the time passed since its last update time is longer than alarm threshold.
 
