@@ -62,7 +62,7 @@ To start it as a persistent service even after terminal logout:
 
 If you would like to enable alarm feature with Gmail, you need to configure settings:
 
-    sudo nohup python report-server.py -a 60 -g "markpeng.ntu@gmail.com" -u "markpeng.ntu" -s "123456"
+    sudo nohup python report-server.py -a 60 -g "markpeng.ntu@gmail.com" -u "markpeng.ntu" -s "123456" &
 
 The above setting triggers the function to send alarm email if there is any machine where the time passed since last update time is longer than alarm threshold.
 
