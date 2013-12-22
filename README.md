@@ -5,11 +5,11 @@ An utility service for automatical gathering of dynamic IP addresses on multiple
 
 ![alt tag](https://raw.github.com/guitarmind/dyn-ip-report-service/master/snapshot.png)
 
-In real-world scenarios, sometimes we encounter problems in managing large amount of physical hosts or virtual machines with dynamic IP addresses. It is really painful to update their address information manually. 
+In real-world scenarios, sometimes we encounter problems in managing large amount of physical hosts or virtual machines with dynamic IP addresses. It is really painful to update their address and status information manually. 
 
 This service can greatly help the administrators who have similar management issues. 
 
-The report client retrieves the latest information of current machine (e.g., hostname, IP address and SSH port) and sends to the report server. Report server maintains and summarizes a list of machine infomation for multiple host and VM guests. It also provides a summary page for administrators to see a full info list of all managed machines.
+The report client retrieves the latest information of current machine (e.g., hostname, IP address and SSH port) and sends to the report server. Report server maintains and summarizes a list of machine infomation for multiple host and VM guests. It also provides a summary page for administrators to see a full info list of all managed machines. Gmail alarm is supported by setting the alarm threshold.
 
 
 ###Installation on Ubuntu 12.04 LTS
