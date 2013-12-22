@@ -240,8 +240,8 @@ def alarmMonitor():
             updateTime = alarmLastUpdateTimes[index]
             content += """<font color=\"red\" style=\"font-size:18px\">%(machine)s</font><br/>
                          (last update time: %(updateTime)s)<br/><br/>""" % { 'machine': machine, 'updateTime': updateTime }
-            content += """Please check their status.<br/><br/>
-                          Sent by <strong>Dynamic IP Report Service</strong>
+        content += """Please check their status.<br/><br/>
+                      Sent by <strong>Dynamic IP Report Service</strong>
                        """
         msg = MIMEText(content, 'html')
         msg['Subject'] = subject
