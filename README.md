@@ -120,7 +120,7 @@ Features:
 
 Features:
 
-  - Support machine alarms by GMail
+  - Support machine alarms by Gmail
 
 
 ##Copyright and License
