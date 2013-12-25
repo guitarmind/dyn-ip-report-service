@@ -100,8 +100,6 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
             filePathList.sort()
             os.chdir(workingFolderPath)
 
-            alarmMachines = []
-            alarmLastUpdateTimes = []
             for fileFullName in filePathList:
                 rowData = None
                 fileName = fileFullName.replace(".txt", "")
@@ -112,51 +110,10 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
                     if raw is not None:
                         data = raw.replace('\n', '').split(',')
                         rowData = { 'hostname': fileName, 'ip': data[0], 'ssh_port': data[1], 'update_time': data[2] }
-                        
-                        # Send mail to administrator if last update time is longer than threshold
-                        last_update_time = datetime.datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S')
-                        timspan = datetime.datetime.now() - last_update_time
-                        if timspan > datetime.timedelta(minutes=int(alarmThresholdInMinutes)):
-                            rowData['alarm'] = True
-                            alarmMachines.append(fileName)
-                            alarmLastUpdateTimes.append(data[2])
 
                         responseData.append(rowData)
                 finally:
                     f.close()
-
-
-            if len(alarmMachines) > 0:
-                machines = ', '.join(alarmMachines)
-                # Specifying from and to addresses
-                fromAddr = "dyn.reporter@gmail.com"
-                toAddrs = mailRecipients
-                toAddrs.append(adminGmail)
-                subject = "Dynamic IP Report Service: Machine Alarm"
-                content = """<strong>Alarm: </strong><br/>
-                             Something wrong with the following machines: <br/>"""
-                for index, machine in enumerate(alarmMachines):
-                    updateTime = alarmLastUpdateTimes[index]
-                    content += """<font color=\"red\" style=\"font-size:18px\">%(machine)s</font><br/>
-                                 (last update time: %(updateTime)s)<br/><br/>""" % { 'machine': machine, 'updateTime': updateTime }
-                content += """Please check their status.<br/><br/>
-                              Sent by <strong>Dynamic IP Report Service</strong>
-                           """
-                msg = MIMEText(content, 'html')
-                msg['Subject'] = subject
-                msg['From'] = fromAddr
-                msg['To'] = ', '.join(toAddrs)
-
-                # Sending the mail
-                server = smtplib.SMTP('smtp.gmail.com:587')
-                server.ehlo()
-                server.starttls()
-                print adminGmailUsername, adminGmailPassword
-                server.login(adminGmailUsername, adminGmailPassword)
-                server.sendmail(fromAddr, toAddrs, msg.as_string())
-                server.quit()
-
-                print 'Send alarm: ', machines, ' (recipients: ', ', '.join(toAddrs) , ')'
 
             responseMsg = { 'result': responseData }
 
