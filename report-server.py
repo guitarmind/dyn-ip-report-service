@@ -265,7 +265,7 @@ def main():
     # start period timer
     loop = tornado.ioloop.IOLoop.instance()
     callbackTime = 3000 + (int(alarmThresholdInMinutes) * 60 * 1000)
-    print "Period Timer Interval: " + alarmThresholdInMinutes + " minutes."
+    print "Period Timer Interval: " + str(alarmThresholdInMinutes) + " minutes."
     periodTaskTimer = tornado.ioloop.PeriodicCallback(callback=alarmMonitor, callback_time=callbackTime, io_loop=loop)
     periodTaskTimer.start()
     loop.start()
