@@ -111,6 +111,11 @@ class SummaryDataHanlder(tornado.web.RequestHandler):
                         data = raw.replace('\n', '').split(',')
                         rowData = { 'hostname': fileName, 'ip': data[0], 'ssh_port': data[1], 'update_time': data[2] }
 
+                        last_update_time = datetime.datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S')
+                        timspan = datetime.datetime.now() - last_update_time
+                        if timspan > datetime.timedelta(minutes=int(alarmThresholdInMinutes)):
+                            rowData['alarm'] = True
+
                         responseData.append(rowData)
                 finally:
                     f.close()
