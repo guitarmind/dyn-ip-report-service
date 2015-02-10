@@ -57,6 +57,15 @@ def sendNewReport(apiUrl, nic):
     p3 = subprocess.Popen(['cut', '-d:', '-f2'], stdin=p2.stdout, stdout=subprocess.PIPE)
     p4 = subprocess.Popen(['cut', '-d', ' ', '-f1'], stdin=p3.stdout, stdout=subprocess.PIPE)
     (ip, err) = p4.communicate()
+
+    # For CentOS version
+    if not ip:
+        p = subprocess.Popen(['ifconfig', nic], stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(['grep', 'inet'], stdin=p.stdout, stdout=subprocess.PIPE)
+        p3 = subprocess.Popen(['cut', '-d:', '-f2'], stdin=p2.stdout, stdout=subprocess.PIPE)
+        p4 = subprocess.Popen(['awk', '{ print $2 }'], stdin=p3.stdout, stdout=subprocess.PIPE)
+        (ip, err) = p4.communicate()
+
     ip = ip.replace('\n', '')
     # print "ip: " + ip
 
